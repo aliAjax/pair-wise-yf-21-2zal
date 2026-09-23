@@ -5,6 +5,9 @@
   --primary: #7c2d12;
   --secondary: #b45309;
   --accent: #0f766e;
+  --danger: #b91c1c;
+  --warn-bg: #fef3c7;
+  --warn-fg: #92400e;
   --border: #d9e2ef;
 }
 
@@ -18,7 +21,8 @@ body {
 }
 
 button,
-input {
+input,
+select {
   font: inherit;
 }
 
@@ -29,6 +33,12 @@ button {
   background: #ffffff;
   color: #172033;
   cursor: pointer;
+  padding: 0 12px;
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .app {
@@ -39,7 +49,8 @@ button {
 
 .hero,
 .panel,
-.metrics article {
+.metrics article,
+.notice {
   background: #ffffff;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -47,11 +58,10 @@ button {
 }
 
 .hero {
-  min-height: 250px;
   display: grid;
   align-content: center;
   gap: 14px;
-  padding: 34px;
+  padding: 30px 34px;
   border-left: 7px solid var(--primary);
 }
 
@@ -65,16 +75,16 @@ button {
 .heading p {
   color: var(--primary);
   font-weight: 800;
+  font-size: 13px;
 }
 
 .hero h1 {
-  font-size: clamp(34px, 6vw, 62px);
-  line-height: 1;
-  letter-spacing: 0;
+  font-size: clamp(28px, 5vw, 46px);
+  line-height: 1.1;
 }
 
 .hero span {
-  max-width: 860px;
+  max-width: 880px;
   color: #526071;
   line-height: 1.75;
 }
@@ -102,9 +112,6 @@ button {
 }
 
 .workspace {
-  display: grid;
-  grid-template-columns: 300px 1fr;
-  gap: 18px;
   margin-bottom: 18px;
 }
 
@@ -112,22 +119,12 @@ button {
   padding: 22px;
 }
 
-.panel h2,
-.panel h3,
-.heading p {
-  margin-top: 0;
+.panel h2 {
+  margin: 0;
 }
 
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.chips button {
-  padding: 0 12px;
-  border-color: color-mix(in srgb, var(--primary) 24%, var(--border));
-  background: color-mix(in srgb, var(--primary) 8%, #ffffff);
+.panel h3 {
+  margin: 0 0 6px;
 }
 
 .heading {
@@ -135,7 +132,7 @@ button {
   align-items: start;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 16px;
 }
 
 .heading h2 {
@@ -146,13 +143,35 @@ button {
   background: var(--primary);
   color: #ffffff;
   border-color: var(--primary);
-  padding: 0 14px;
+}
+
+.warn-btn {
+  background: var(--warn-bg);
+  border-color: #fcd34d;
+  color: var(--warn-fg);
+  font-weight: 700;
+}
+
+.link-btn {
+  border-color: transparent;
+  background: transparent;
+  color: var(--accent);
+  min-height: auto;
+  padding: 2px 6px;
+}
+
+.link-btn.danger {
+  color: var(--danger);
 }
 
 .field-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
+}
+
+.field-wide {
+  grid-column: 1 / -1;
 }
 
 label {
@@ -165,12 +184,351 @@ label span {
   font-size: 13px;
 }
 
-input {
+input,
+select {
   width: 100%;
   min-height: 42px;
   border-radius: 7px;
   border: 1px solid var(--border);
   padding: 0 12px;
+  background: #ffffff;
+}
+
+.muted {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* 通知条 */
+
+.notice {
+  margin: 14px 0;
+  padding: 14px 18px;
+  display: grid;
+  gap: 6px;
+  box-shadow: none;
+}
+
+.notice strong {
+  font-size: 14px;
+}
+
+.notice-ok {
+  border-left: 6px solid var(--accent);
+  background: #f0fdfa;
+}
+
+.notice-err {
+  border-left: 6px solid var(--danger);
+  background: #fef2f2;
+}
+
+.notice-errors {
+  margin: 4px 0 0;
+  padding-left: 18px;
+  color: #7f1d1d;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* 批量排期 */
+
+.batch-head {
+  display: flex;
+  align-items: end;
+  gap: 12px;
+}
+
+.date-label {
+  min-width: 170px;
+}
+
+.date-label span {
+  margin-bottom: -2px;
+}
+
+.rule-note {
+  margin: 0 0 14px;
+  padding: 10px 12px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--secondary) 8%, #ffffff);
+  color: #526071;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.rule-note b {
+  color: var(--danger);
+}
+
+.batch-rows {
+  display: grid;
+  gap: 8px;
+}
+
+.batch-row {
+  display: grid;
+  grid-template-columns: 34px minmax(140px, 1.1fr) 110px minmax(220px, 2fr) 64px;
+  gap: 10px;
+  align-items: center;
+}
+
+.batch-row-head {
+  color: #64748b;
+  font-size: 12px;
+}
+
+.batch-row-head span {
+  white-space: nowrap;
+}
+
+.batch-row b {
+  display: grid;
+  place-items: center;
+  height: 34px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--primary) 10%, #ffffff);
+  color: var(--primary);
+}
+
+.batch-row input {
+  min-height: 40px;
+}
+
+.batch-window {
+  font-size: 13px;
+  color: #526071;
+}
+
+.batch-foot {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 14px 0;
+}
+
+.hint-ok {
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.hint-err {
+  color: var(--danger);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.hint-err em {
+  font-style: normal;
+  margin-left: 6px;
+}
+
+.day-brief {
+  border-top: 1px dashed var(--border);
+  padding-top: 10px;
+  font-size: 13px;
+  color: #526071;
+}
+
+.day-brief ul {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+
+.day-brief li b {
+  margin-right: 8px;
+}
+
+.chip {
+  display: inline-block;
+  margin: 2px 4px 2px 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 10%, #ffffff);
+  color: var(--accent);
+  font-size: 12px;
+}
+
+/* 池位看板 */
+
+.pool-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.pool-col {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px;
+  background: #fbfdff;
+  min-height: 160px;
+}
+
+.pool-col header {
+  margin-bottom: 10px;
+}
+
+.cap {
+  font-size: 12px;
+  color: #64748b;
+}
+
+.cap-full {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.cap-bar {
+  height: 6px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: #e2e8f0;
+  overflow: hidden;
+}
+
+.cap-bar i {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--secondary));
+}
+
+.booking-card {
+  border: 1px solid var(--border);
+  border-left-width: 5px;
+  border-radius: 7px;
+  padding: 10px 12px;
+  margin-bottom: 10px;
+  background: #ffffff;
+}
+
+.booking-scheduled {
+  border-left-color: #64748b;
+}
+
+.booking-washing {
+  border-left-color: var(--accent);
+}
+
+.booking-suspended {
+  border-left-color: var(--danger);
+  background: #fff7ed;
+}
+
+.booking-completed {
+  border-left-color: #94a3b8;
+  opacity: 0.85;
+}
+
+.booking-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.booking-meta {
+  margin: 4px 0;
+  font-size: 13px;
+  color: #526071;
+}
+
+.fix-line {
+  margin: 4px 0;
+  font-size: 12px;
+  color: var(--warn-fg);
+}
+
+.booking-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 6px;
+}
+
+.booking-actions button {
+  min-height: 32px;
+  font-size: 13px;
+}
+
+.fix-form {
+  margin-top: 10px;
+  display: grid;
+  gap: 8px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.suspend-note {
+  margin: 0;
+  color: var(--danger);
+  font-size: 12px;
+}
+
+.empty-line {
+  color: #94a3b8;
+  font-size: 13px;
+}
+
+/* 状态徽标 */
+
+.badge {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.badge-idle {
+  background: #f1f5f9;
+  color: #64748b;
+}
+
+.badge-scheduled {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.badge-washing {
+  background: #ccfbf1;
+  color: #115e59;
+}
+
+.badge-suspended {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-completed {
+  background: #e0f2fe;
+  color: #075985;
+}
+
+/* 档案列表 */
+
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.filter-bar input[type],
+.filter-bar select {
+  width: auto;
+  min-width: 150px;
+  flex: 1 1 150px;
+}
+
+.filter-search {
+  flex: 2 1 220px;
 }
 
 .records {
@@ -196,27 +554,61 @@ input {
   border-radius: 8px;
   color: #ffffff;
   background: linear-gradient(135deg, var(--primary), var(--accent));
+  font-size: 14px;
+}
+
+.record-title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .records h3 {
-  margin-bottom: 6px;
+  margin: 0;
 }
 
 .records p {
-  margin: 0;
+  margin: 4px 0 0;
   color: #526071;
   line-height: 1.6;
+  font-size: 14px;
 }
 
-@media (max-width: 860px) {
+.booking-ref {
+  color: var(--accent) !important;
+  font-weight: 600;
+}
+
+.app-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #94a3b8;
+  font-size: 13px;
+  padding: 6px 4px;
+}
+
+@media (max-width: 900px) {
   .metrics,
-  .workspace,
+  .pool-grid,
   .field-grid {
     grid-template-columns: 1fr;
   }
 
-  .hero {
-    min-height: 210px;
-    padding: 24px;
+  .batch-row {
+    grid-template-columns: 28px 1fr 90px;
+  }
+
+  .batch-row .batch-window,
+  .batch-row-head span:nth-child(4),
+  .batch-row-head span:last-child {
+    display: none;
+  }
+
+  .batch-row .link-btn {
+    grid-column: 2 / -1;
+    justify-self: start;
   }
 }

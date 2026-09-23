@@ -1,126 +1,105 @@
+import { useCallback, useState } from "react";
 import "./styles.css";
-
-const project = {
-  "sourceNo": 2,
-  "id": "hxyfront-62009",
-  "port": 62009,
-  "title": "地毯修复纹样档案",
-  "domain": "手工地毯修复",
-  "prompt": "做一个给手工地毯修复工作室使用的纹样与修复档案前端项目，可以记录地毯产地、年代、结密度、材质、染色类型、破损区域、补线颜色和修复工序。页面需要有纹样局部标记图、修复前后记录、材料色卡、工序进度和按产地筛选的档案列表。",
-  "palette": [
-    "#7c2d12",
-    "#b45309",
-    "#0f766e"
-  ],
-  "metrics": [
-    "待修复",
-    "纹样档案",
-    "色卡数量",
-    "完工率"
-  ],
-  "filters": [
-    "波斯",
-    "安纳托利亚",
-    "高加索",
-    "藏毯"
-  ],
-  "fields": [
-    "地毯产地",
-    "年代",
-    "结密度",
-    "材质",
-    "染色类型",
-    "破损区域"
-  ],
-  "records": [
-    [
-      "CAR-092",
-      "波斯",
-      "羊毛，约1960s",
-      "边缘磨损待补线"
-    ],
-    [
-      "CAR-117",
-      "安纳托利亚",
-      "植物染，结密度42",
-      "中心纹样缺口"
-    ],
-    [
-      "CAR-138",
-      "藏毯",
-      "局部褪色",
-      "需匹配靛蓝色卡"
-    ]
-  ]
-};
+import { useDeskStore, todayISO } from "./business/storage";
+import { isOccupying } from "./business/scheduling";
+import { RegisterForm } from "./components/RegisterForm";
+import { BatchPlanner } from "./components/BatchPlanner";
+import { PoolBoard } from "./components/PoolBoard";
+import { CarpetList } from "./components/CarpetList";
+import { Notice, type NoticeState, type Notify } from "./components/ui";
+import type { ActionResult } from "./business/types";
 
 function App() {
+  const store = useDeskStore();
+  const [notice, setNotice] = useState<NoticeState | null>(null);
+  const [date, setDate] = useState(todayISO());
+
+  const notify = useCallback<Notify>((result: ActionResult) => {
+    setNotice({
+      key: Date.now() + Math.random(),
+      ok: result.ok,
+      message: result.message,
+      errors: result.ok ? undefined : result.errors,
+    });
+  }, []);
+
+  const { carpets, bookings, fixLogs } = store.state;
+  const suspended = bookings.filter((b) => b.status === "suspended").length;
+  const occupying = bookings.filter((b) => isOccupying(b.status)).length;
+  const completed = bookings.filter((b) => b.status === "completed").length;
+
   return (
     <main className="app">
       <section className="hero">
-        <p>{project.id} · 源提示词{project.sourceNo} · Port {project.port}</p>
-        <h1>{project.title}</h1>
-        <span>{project.prompt}</span>
+        <p>hxyfront-62009 · 手工地毯清洗排期台</p>
+        <h1>地毯清洗排期台</h1>
+        <span>
+          登记地毯编号、产地、清洗池与预计时长；同一清洗池同一时段只接待一条地毯。
+          批量排期遇压边或超容量整批退回；清洗中脱色即挂起保留池位，补做固色登记后恢复清洗。
+        </span>
       </section>
+
+      <Notice key={notice?.key} notice={notice} />
 
       <section className="metrics">
-        {project.metrics.map((metric: string, index: number) => (
-          <article key={metric}>
-            <small>{metric}</small>
-            <strong>{[28, 6, 14, 91][index] ?? 10}</strong>
-          </article>
-        ))}
+        <article>
+          <small>地毯档案</small>
+          <strong>{carpets.length}</strong>
+        </article>
+        <article>
+          <small>占用中池位</small>
+          <strong>{occupying}</strong>
+        </article>
+        <article>
+          <small>脱色挂起</small>
+          <strong>{suspended}</strong>
+        </article>
+        <article>
+          <small>固色登记 / 已完工</small>
+          <strong>
+            {fixLogs.length} / {completed}
+          </strong>
+        </article>
       </section>
 
-      <section className="workspace">
-        <aside className="panel">
-          <h2>{project.domain}分类</h2>
-          <div className="chips">
-            {project.filters.map((item: string) => (
-              <button key={item}>{item}</button>
-            ))}
-          </div>
-        </aside>
+      <div className="workspace">
+        <RegisterForm store={store} notify={notify} />
+      </div>
 
-        <section className="panel form-panel">
-          <div className="heading">
-            <div>
-              <p>专业字段</p>
-              <h2>新增记录</h2>
-            </div>
-            <button className="primary">保存记录</button>
-          </div>
-          <div className="field-grid">
-            {project.fields.map((field: string) => (
-              <label key={field}>
-                <span>{field}</span>
-                <input placeholder={"填写" + field} />
-              </label>
-            ))}
-          </div>
-        </section>
-      </section>
+      <div className="workspace">
+        <BatchPlanner
+          store={store}
+          date={date}
+          onDateChange={setDate}
+          notify={notify}
+        />
+      </div>
 
-      <section className="panel">
-        <div className="heading">
-          <div>
-            <p>近期记录</p>
-            <h2>工作台摘要</h2>
-          </div>
-          <button>导出CSV</button>
-        </div>
-        <div className="records">
-          {project.records.map((record: string[], index: number) => (
-            <article key={record.join("-")}>
-              <b>{String(index + 1).padStart(2, "0")}</b>
-              <div>
-                <h3>{record[0]}</h3>
-                <p>{record.slice(1).join(" · ")}</p>
-              </div>
-            </article>
-          ))}
-        </div>
-      </section>
+      <div className="workspace">
+        <PoolBoard
+          store={store}
+          date={date}
+          onDateChange={setDate}
+          notify={notify}
+        />
+      </div>
+
+      <div className="workspace">
+        <CarpetList store={store} />
+      </div>
+
+      <footer className="app-foot">
+        <span>数据仅保存在本浏览器 localStorage，刷新不丢失。</span>
+        <button
+          className="link-btn danger"
+          onClick={() => {
+            store.resetAll();
+            notify({ ok: true, message: "已重置为演示数据" });
+          }}
+        >
+          重置演示数据
+        </button>
+      </footer>
     </main>
   );
 }
